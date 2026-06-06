@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Shopping Cart</title>
+</head>
+<body>
+
+<h2>Shopping Cart</h2>
+
+<button onclick="loadCart()">Load Cart</button>
+
+<div id="cart"></div>
+
+<script>
+  const cart1 = [
+    { name: "Laptop", price: 50000 },
+    { name: "Mouse", price: 500 }
+  ];
+
+  const cart2 = [
+    { name: "Keyboard", price: 1500 },
+    { name: "Headphones", price: 2000 }
+  ];
+
+  const loadCart = () => {
+    const allProducts = [...cart1, ...cart2];
+
+    const total = allProducts.reduce((sum, item) => sum + item.price, 0);
+
+    let output = "";
+
+    allProducts.forEach(({ name, price }) => {
+      output += `<p>Product: ${name}, Price: ${price}</p>`;
+    });
+
+    output += `<h3>Total Price: ${total}</h3>`;
+
+    document.getElementById("cart").innerHTML = output;
+  };
+</script>
+
+</body>
+</html>
