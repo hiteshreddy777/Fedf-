@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediGlow · Equipment Care</title>
+  <!-- Google Fonts & Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="glass-dashboard">
+  <!-- ========== HEADER ========== -->
+  <header class="header">
+    <div class="logo">
+      <i class="fas fa-heartbeat"></i>
+      <h1>MediGlow<span>Care</span></h1>
+    </div>
+    <div class="header-actions">
+      <button class="notification-btn" id="notifBtn"><i class="fas fa-bell"></i></button>
+      <div class="user-profile">
+        <img src="https://ui-avatars.com/api/?name=Alex+Nova&background=2196f3&color=fff&bold=true" alt="user">
+        <span>Alex Nova</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========== GREETING ========== -->
+  <div class="greeting">
+    <div>
+      <h2>Good afternoon, <strong>Alex</strong> 👋</h2>
+      <p>You have <strong id="taskCount">7</strong> tasks due this week.</p>
+    </div>
+    <div class="pill"><i class="fas fa-calendar-check"></i> <span id="urgentCount">3</span> urgent</div>
+  </div>
+
+  <!-- ========== KPI CARDS ========== -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon"><i class="fas fa-tools"></i></div>
+      <div class="kpi-content">
+        <h3>Total Equipment</h3>
+        <div class="value" id="totalEquipment">0</div>
+        <span class="trend up"><i class="fas fa-arrow-up"></i> +3 this month</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon"><i class="fas fa-exclamation-triangle"></i></div>
+      <div class="kpi-content">
+        <h3>Maintenance Due</h3>
+        <div class="value" id="maintenanceDue">0</div>
+        <span class="trend down"><i class="fas fa-arrow-down"></i> 2 overdue</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon"><i class="fas fa-check-circle"></i></div>
+      <div class="kpi-content">
+        <h3>Operational</h3>
+        <div class="value" id="operationalPercent">0%</div>
+        <span class="trend up"><i class="fas fa-arrow-up"></i> +4%</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon"><i class="fas fa-clock"></i></div>
+      <div class="kpi-content">
+        <h3>Avg. Downtime</h3>
+        <div class="value" id="avgDowntime">0h</div>
+        <span class="trend down"><i class="fas fa-arrow-down"></i> -0.5h</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== CHARTS ========== -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Equipment Status</h3>
+        <span><i class="fas fa-circle" style="color:#4caf50;"></i> Operational</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="statusChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Maintenance Trends</h3>
+        <span><i class="fas fa-circle" style="color:#ff9800;"></i> This year</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="trendChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== EQUIPMENT TABLE ========== -->
+  <div class="table-panel">
+    <div class="table-toolbar">
+      <div class="search-wrapper">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search by name, ID, model...">
+      </div>
+      <div style="display: flex; gap: 1rem;">
+        <button class="btn-outline" id="exportBtn"><i class="fas fa-download"></i> Export CSV</button>
+        <button class="btn-primary" id="addBtn"><i class="fas fa-plus"></i> Add Equipment</button>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table id="equipmentTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Device</th>
+            <th>Model</th>
+            <th>Department</th>
+            <th>Status</th>
+            <th>Last Maint.</th>
+            <th>Next Due</th>
+            <th>Technician</th>
+            <th>Priority</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- dynamic rows will be injected here -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" id="pagination"></div>
+  </div>
+
+  <!-- ========== FOOTER NOTE ========== -->
+  <div style="text-align: center; opacity: 0.6; font-size: 0.8rem; margin-top: 1.5rem;">
+    <i class="fas fa-shield-alt"></i> Real‑time sync · HIPAA compliant mock
+  </div>
+</div>
+
+<!-- ========== MODAL (ADD/EDIT) ========== -->
+<div class="modal" id="equipmentModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modalTitle">Add Equipment</h2>
+      <button class="close-modal" id="closeModal">&times;</button>
+    </div>
+    <form id="equipmentForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Device Name *</label>
+          <input type="text" id="name" required placeholder="e.g. MRI 3.0T">
+        </div>
+        <div class="form-group">
+          <label>Model</label>
+          <input type="text" id="model" placeholder="Signa Explorer">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Department</label>
+          <select id="department">
+            <option value="Radiology">Radiology</option>
+            <option value="ICU">ICU</option>
+            <option value="Emergency">Emergency</option>
+            <option value="Surgery">Surgery</option>
+            <option value="Cardiology">Cardiology</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Technician</label>
+          <input type="text" id="technician" placeholder="Assigned tech">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Status</label>
+          <select id="status">
+            <option value="Operational">Operational</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Critical">Critical</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Priority</label>
+          <select id="priority">
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+            <option value="Critical">Critical</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Last Maintenance</label>
+          <input type="date" id="lastMaintenance">
+        </div>
+        <div class="form-group">
+          <label>Next Due</label>
+          <input type="date" id="nextDue">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea id="notes" rows="2"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-outline" id="cancelModal">Cancel</button>
+        <button type="submit" class="btn-primary" id="saveBtn">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========== NOTIFICATION PANEL ========== -->
+<div class="notif-panel" id="notifPanel">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+    <strong>Notifications</strong>
+    <span style="background:#2196f3; color:white; padding:2px 8px; border-radius:30px;">3 new</span>
+  </div>
+  <div class="notif-item"><i class="fas fa-exclamation-circle" style="color:#f44336;"></i> MRI overdue since yesterday</div>
+  <div class="notif-item"><i class="fas fa-check-circle" style="color:#4caf50;"></i> Ventilator #V12 completed</div>
+  <div class="notif-item"><i class="fas fa-bell" style="color:#ff9800;"></i> Warranty expiring in 7 days</div>
+</div>
+
+<!-- Custom JavaScript -->
+<script src="script.js"></script>
+</body>
+</html>
