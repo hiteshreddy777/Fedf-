@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+        <h1>Student Result Processing System</h1>
+        <button onclick="DisplayDetails()">Display Details</button>
+        <p id="output"></p>
+        <script>
+            class Student{
+                constructor(name,...allmarks){
+                    this.name=name;
+                    this.allmarks=allmarks;
+                }
+                totalmarks=()=>{
+                    const total=this.allmarks.reduce((sum,d)=>sum+d,0)
+                    const average=total/this.allmarks.length;
+                    return {total,average};
+                  
+                };
+            }
+            const DisplayDetails=()=>{
+                const sem1=[100,90,80];
+                const sem2=[78,90,45];
+                const allmarks=[...sem1,...sem2];
+                const student=new Student("Pranavi ",...allmarks);
+                const{name,allmarks: marks}=student;
+                const { total, average } = student.totalmarks(); 
+                document.getElementById("output").innerHTML=`
+                <p>Student Name:${name}</p>
+                <p>Total Marks:${total}</p>
+                <p>Average Marks:${average}</p>
+            `;
+            }
+        </script>
+    </body>
+</html>
