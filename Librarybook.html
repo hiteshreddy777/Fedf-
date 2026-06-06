@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <h1>Library Book Management System</h1>
+        <button onclick="DisplayDetails()">Display Details</button>
+        <p id="output"></p>
+        <script>
+            class Book{
+                constructor(title,author,price,...discounts){
+                    this.title=title;
+                    this.author=author;
+                    this.price=price;
+                    this.discounts=discounts;
+                }
+                
+                finalprice=()=>{
+                    const totaldis=this.discounts.reduce((sum,d)=>sum+d,0);
+                    return this.price-totaldis;
+                };
+            }
+            const DisplayDetails=()=>{
+                const book=new Book("Polity","Shaik",4000,89,90,78);
+                const{title,author,price,discounts}=book;
+                    document.getElementById("output").innerHTML = `
+                    <p>Name: ${title}</p>
+                    <p>Author: ${author}</p>
+                    <p>price: ${price}</p>
+                   <p>Total Cost: ${book.finalprice()}</p>
+                  `;
+
+            }
+        </script>
+    </body>
+</html>
