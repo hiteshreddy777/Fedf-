@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employee Management System</title>
+</head>
+<body>
+
+<h2>Employee Management System</h2>
+
+<button onclick="getEmployee()">GET</button>
+<button onclick="addEmployee()">POST</button>
+<button onclick="updateEmployee()">PUT</button>
+<button onclick="deleteEmployee()">DELETE</button>
+
+<h3>Output:</h3>
+<p id="output"></p>
+
+<script>
+
+    // GET Employee Details
+    function getEmployee() {
+
+        document.getElementById("output").innerHTML =
+
+        "<h3>Employee List</h3>" +
+
+        "1. Name: Jhansi <br>" +
+        "Salary: 80000 <br>" +
+        "Email: Jhansi@gmail.com <br><br>" +
+
+        "2. Name: Sravya <br>" +
+        "Salary: 40000 <br>" +
+        "Email: Sravya@gmail.com";
+    }
+
+
+    // POST Add New Employee
+    function addEmployee() {
+
+        document.getElementById("output").innerHTML =
+
+        "<h3>Updated Employee List</h3>" +
+
+        "1. Name: Jhansi <br>" +
+        "Salary: 80000 <br>" +
+        "Email: radha@gmail.com <br><br>" +
+
+        "2. Name: Sravya <br>" +
+        "Salary: 40000 <br>" +
+        "Email: Sravya@gmail.com <br><br>" +
+
+        "3. Name: Nandu <br>" +
+        "Salary: 65000 <br>" +
+        "Email: Nandu@gmail.com";
+    }
+
+
+    // PUT Update Employee Details
+    function updateEmployee() {
+
+        document.getElementById("output").innerHTML =
+
+        "<h3>Updated Employee Details</h3>" +
+
+        "1. Name: Jhansi Priya <br>" +
+        "Salary: 60000 <br>" +
+        "Email: radha123@gmail.com <br><br>" +
+
+        "2. Name: Sravya <br>" +
+        "Salary: 40000 <br>" +
+        "Email: Sravya@gmail.com <br><br>" +
+
+        "3. Name: Nandu <br>" +
+        "Salary: 65000 <br>" +
+        "Email: Nandu@gmail.com";
+    }
+
+
+    // DELETE Employee
+    function deleteEmployee() {
+
+        document.getElementById("output").innerHTML =
+
+        "<h3>Employee List After Delete</h3>" +
+
+        "1. Name: Jhansi Priya <br>" +
+        "Salary: 80000 <br>" +
+        "Email: Jhansi123@gmail.com <br><br>" +
+
+        "2. Name: Nandu <br>" +
+        "Salary: 65000 <br>" +
+        "Email: Nandu@gmail.com";
+    }
+
+</script>
+
+</body>
+</html>
