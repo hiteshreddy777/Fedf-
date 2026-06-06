@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Student Records: Direct DOM vs Virtual DOM Demo</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', 'Inter', 'Roboto', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(145deg, #e9f0fc 0%, #d9e2f1 100%);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+    }
+
+    .app-container {
+      max-width: 1100px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(2px);
+      border-radius: 2.5rem;
+      padding: 1.8rem 2rem 2rem 2rem;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease;
+    }
+
+    h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      margin: 0 0 0.25rem 0;
+      background: linear-gradient(135deg, #1E2A5E, #2c3e66);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: -0.3px;
+    }
+
+    .sub {
+      color: #2c3e66;
+      border-left: 4px solid #4f7eb3;
+      padding-left: 1rem;
+      margin: 0.5rem 0 1.8rem 0;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+
+    .grid-layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      flex: 1;
+      min-width: 260px;
+      background: white;
+      border-radius: 1.8rem;
+      overflow: hidden;
+      box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+    }
+
+    .card-header {
+      background: #1e2f41;
+      padding: 1rem 1.5rem;
+      color: white;
+      font-weight: 600;
+      font-size: 1.25rem;
+      letter-spacing: -0.2px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-header span {
+      background: #ffd966;
+      color: #1e2a3a;
+      border-radius: 40px;
+      padding: 0.1rem 0.6rem;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .student-list {
+      list-style: none;
+      margin: 0;
+      padding: 0.5rem 0;
+    }
+
+    .student-item {
+      padding: 0.8rem 1.5rem;
+      border-bottom: 1px solid #eef2f8;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1rem;
+      transition: background 0.1s ease;
+    }
+
+    .student-item:last-child {
+      border-bottom: none;
+    }
+
+    .student-index {
+      font-weight: 600;
+      background: #eef3fc;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 30px;
+      color: #1e4663;
+      font-size: 0.8rem;
+    }
+
+    .student-name {
+      font-weight: 500;
+      color: #1f2f44;
+      flex: 1;
+    }
+
+    .badge-updated {
+      background: #e0f2fe;
+      padding: 0.2rem 0.7rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #0c6b8f;
+      white-space: nowrap;
+    }
+
+    /* action zone */
+    .actions-panel {
+      margin-top: 0.8rem;
+      background: #f8fafd;
+      border-radius: 1.5rem;
+      padding: 1.2rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+      justify-content: space-between;
+    }
+
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
+    button {
+      background: white;
+      border: none;
+      padding: 0.6rem 1.3rem;
+      border-radius: 3rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      border: 1px solid #cddfed;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    button i {
+      font-style: normal;
+      font-weight: bold;
+    }
+
+    .btn-primary {
+      background: #1e4663;
+      color: white;
+      border: none;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-primary:hover {
+      background: #0f3550;
+      transform: scale(0.97);
+    }
+
+    .btn-outline {
+      background: white;
+      border: 1px solid #b9d0e5;
+    }
+
+    .btn-outline:hover {
+      background: #eef3fc;
+      border-color: #7fa1c2;
+    }
+
+    .info-note {
+      background: #eef3fc;
+      padding: 0.45rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.75rem;
+      color: #2c5282;
+      font-weight: 500;
+    }
+
+    hr {
+      margin: 1rem 0;
+      border: none;
+      height: 1px;
+      background: linear-gradient(to right, #cbdde9, transparent);
+    }
+
+    footer {
+      font-size: 0.7rem;
+      text-align: center;
+      margin-top: 1.5rem;
+      color: #3b5f8a;
+    }
+
+    @media (max-width: 700px) {
+      .app-container {
+        padding: 1rem;
+      }
+      .student-item {
+        padding: 0.6rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <h1>📚 Student Records Manager</h1>
+  <div class="sub">✨ Direct DOM vs Virtual DOM — smart re‑rendering demo</div>
+
+  <div class="grid-layout">
+    <!-- DIRECT DOM PANEL (full re-render) -->
+    <div class="card">
+      <div class="card-header">
+        🧩 Direct DOM
+        <span>full update</span>
+      </div>
+      <div id="directListContainer">
+        <!-- dynamically rendered student list here -->
+        <ul class="student-list" id="directStudentList">
+          <li class="student-item">Loading...</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- VIRTUAL DOM PANEL (targeted update) -->
+    <div class="card">
+      <div class="card-header">
+        ⚛️ Virtual DOM
+        <span>smart diff</span>
+      </div>
+      <div id="virtualListContainer">
+        <ul class="student-list" id="virtualStudentList">
+          <li class="student-item">Loading...</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Control zone: change names + re-render triggers -->
+  <div class="actions-panel">
+    <div class="btn-group">
+      <button id="changeNamesBtn" class="btn-primary">✏️ Change 1–2 student(s) in array</button>
+      <button id="directRenderBtn" class="btn-outline">🔄 Direct DOM (full re-render)</button>
+      <button id="virtualRenderBtn" class="btn-outline">🎯 Virtual DOM (update only changed)</button>
+    </div>
+    <div class="info-note">
+      💡 Direct DOM: rebuilds entire list from scratch &nbsp;|&nbsp;
+      🧠 Virtual DOM: compares & updates only modified rows
+    </div>
+  </div>
+  <footer>
+    * Initial display: 10 student names. Click "Change 1–2 student(s)" to modify underlying array, then test both renderers.
+  </footer>
+</div>
+
+<script>
+  // ---------- INITIAL STUDENT ARRAY (10 records) ----------
+  let students = [
+    { id: 1, name: "Emma Watson", updated: false },
+    { id: 2, name: "Liam Chen", updated: false },
+    { id: 3, name: "Sophia Rodriguez", updated: false },
+    { id: 4, name: "Noah Kapoor", updated: false },
+    { id: 5, name: "Olivia Bennett", updated: false },
+    { id: 6, name: "Mason Kim", updated: false },
+    { id: 7, name: "Isabella Dupont", updated: false },
+    { id: 8, name: "Lucas Silva", updated: false },
+    { id: 9, name: "Mia Haddad", updated: false },
+    { id: 10, name: "Ethan Wright", updated: false }
+  ];
+
+  // Helper: reset the 'updated' flag for all students (called before new changes to show accurate highlight)
+  function resetUpdatedFlags() {
+    for (let s of students) {
+      s.updated = false;
+    }
+  }
+
+  // Function: Modify one or two random students in the array (changes name and sets updated flag = true)
+  // This simulates "changing the name of one or two students in the array"
+  function modifyOneOrTwoStudents() {
+    // Ensure we reset previous update flags so that only current modifications are highlighted
+    resetUpdatedFlags();
+    
+    const numChanges = Math.random() > 0.5 ? 1 : 2;   // randomly choose 1 or 2 students to modify
+    const indices = new Set();
+    while (indices.size < numChanges) {
+      const randomIndex = Math.floor(Math.random() * students.length);
+      indices.add(randomIndex);
+    }
+    
+    // list of name variations to create obvious changes
+    const nameVariants = [
+      "🌱 Nova Reed", "⭐ Zara Quinn", "🔹 Aris Thorne", "✨ Milo Vance", "🌀 Lena Cross",
+      "🎯 Felix Park", "⚡ Sasha Wells", "🌟 Jordan Blythe", "💡 Casey Morgan", "🎨 Riley Hart"
+    ];
+    
+    for (let idx of indices) {
+      const originalStudent = students[idx];
+      // Generate a new distinct name (avoid endless same but it's fine)
+      const randomNewName = nameVariants[Math.floor(Math.random() * nameVariants.length)] + ` (updated)`;
+      // Alternatively ensure each changed student gets a unique-ish name
+      students[idx] = {
+        ...originalStudent,
+        name: randomNewName,
+        updated: true
+      };
+    }
+    
+    // Edge case: if by random indices we get the same student? no, set handles uniq.
+    // Return changed indices for info
+    return Array.from(indices);
+  }
+
+  // ========== 1. DIRECT DOM FUNCTION: full re-render from scratch ==========
+  // This function uses the Direct DOM approach: completely rebuilds the list element
+  function renderWithDirectDOM() {
+    const container = document.getElementById("directStudentList");
+    if (!container) return;
+    
+    // Create new ul element or clear existing? For direct dom we replace content fully.
+    // According to "re-render the entire list" we will regenerate HTML and set innerHTML.
+    // This is a classic direct DOM manipulation (blows away previous DOM nodes).
+    let html = '';
+    students.forEach((student, idx) => {
+      const indexNum = idx + 1;
+      const updatedBadge = student.updated ? '<span class="badge-updated">✨ updated</span>' : '';
+      html += `
+        <li class="student-item" data-id="${student.id}">
+          <div class="student-index">${indexNum}</div>
+          <div class="student-name">${escapeHtml(student.name)}</div>
+          ${updatedBadge}
+        </li>
+      `;
+    });
+    container.innerHTML = html;
+  }
+  
+  // Virtual DOM state FOR VIRTUAL PANEL ONLY: we store previous rendered representation
+  // We'll implement a simple virtual DOM that holds a representation of the list items
+  // and then applies minimal DOM updates based on differences.
+  
+  // Virtual representation: array of objects { id, name, updatedFlag, index }
+  let lastVirtualState = [];   // stores previous rendered item data
+  
+  // Helper: escape HTML to avoid injection (good practice)
+  function escapeHtml(str) {
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+      return c;
+    });
+  }
+  
+  // Compute the current virtual representation from students array
+  function getCurrentVirtualRepresentation() {
+    return students.map((student, idx) => ({
+      id: student.id,
+      name: student.name,
+      updated: student.updated,
+      index: idx,
+      displayIndex: idx + 1
+    }));
+  }
+  
+  // Efficient DOM update using diffing (only changes what's needed)
+  // This simulates the Virtual DOM reconciliation (no framework, but pure JS diff + patch)
+  function updateVirtualDOM() {
+    const container = document.getElementById("virtualStudentList");
+    if (!container) return;
+    
+    const newRepresentation = getCurrentVirtualRepresentation();
+    
+    // If no previous state exists or lastVirtualState length is 0, do initial full render
+    if (lastVirtualState.length === 0) {
+      // Full render for the first time (bootstrap)
+      fullRenderVirtualList(container, newRepresentation);
+      lastVirtualState = JSON.parse(JSON.stringify(newRepresentation)); // deep copy
+      return;
+    }
+    
+    // Diff: Compare each list item between lastVirtualState and newRepresentation
+    // We assume the list has same length and IDs are stable (no reordering or removal, but we handle changes)
+    // For robustness, we handle element updates if name or updated flag changed.
+    const currentListItems = container.querySelectorAll('li.student-item');
+    
+    // If lengths mismatch due to some unforeseen array mutation (but we only modify names)
+    // We'll do safe fallback - but our array length stays 10. However could expand, but ok.
+    if (currentListItems.length !== newRepresentation.length) {
+      // drastic change: full rebuild (edge case but still virtual comparison safe)
+      fullRenderVirtualList(container, newRepresentation);
+      lastVirtualState = JSON.parse(JSON.stringify(newRepresentation));
+      return;
+    }
+    
+    // Walk each existing list item and update only if content differs
+    for (let i = 0; i < newRepresentation.length; i++) {
+      const newItem = newRepresentation[i];
+      const oldItem = lastVirtualState[i];
+      const listItem = currentListItems[i];
+      if (!listItem) continue;
+      
+      // Check if name changed OR updated flag changed
+      const nameChanged = (oldItem?.name !== newItem.name);
+      const updatedFlagChanged = (oldItem?.updated !== newItem.updated);
+      
+      if (nameChanged || updatedFlagChanged) {
+        // Update inner content efficiently
+        const nameSpan = listItem.querySelector('.student-name');
+        if (nameSpan && nameChanged) {
+          nameSpan.innerHTML = escapeHtml(newItem.name);
+        }
+        // update badge presence / absence
+        let badgeSpan = listItem.querySelector('.badge-updated');
+        if (newItem.updated) {
+          if (!badgeSpan) {
+            // badge missing, create and append
+            badgeSpan = document.createElement('span');
+            badgeSpan.className = 'badge-updated';
+            badgeSpan.textContent = '✨ updated';
+            listItem.appendChild(badgeSpan);
+          } else {
+            badgeSpan.textContent = '✨ updated';
+          }
+        } else {
+          if (badgeSpan) {
+            badgeSpan.remove();
+          }
+        }
+        // Also maybe update data attributes, but not needed.
+        // Additionally: index number could change? but indices are stable because we preserve order.
+        // minor: ensure index display is correct when names only change, indices remain the same like 1..10.
+      }
+    }
+    
+    // After patch, update stored state snapshot
+    lastVirtualState = JSON.parse(JSON.stringify(newRepresentation));
+  }
+  
+  // Helper: full render for virtual list (initial or fallback)
+  function fullRenderVirtualList(container, representation) {
+    let html = '';
+    for (let item of representation) {
+      const updatedBadge = item.updated ? '<span class="badge-updated">✨ updated</span>' : '';
+      html += `
+        <li class="student-item" data-id="${item.id}">
+          <div class="student-index">${item.displayIndex}</div>
+          <div class="student-name">${escapeHtml(item.name)}</div>
+          ${updatedBadge}
+        </li>
+      `;
+    }
+    container.innerHTML = html;
+  }
+  
+  // Sync virtual container with current students using virtual DOM diff
+  function renderWithVirtualDOM() {
+    // This function implements virtual dom update only changed records.
+    // It uses the internal diffing mechanism (updateVirtualDOM)
+    updateVirtualDOM();
+  }
+  
+  // Helper: BOTH panels should stay coherent after any change in STUDENTS array.
+  // But we will not call render automatically: user explicitly tests each render method.
+  // However, after array modification, both panels still show stale data until render triggered.
+  // That's by design: user can see difference between "full re-render (direct DOM)" vs "smart update (virtual)".
+  // Also: We'll provide initial rendering for both panels on page load.
+  
+  // Initialize first render for both panels (display 10 names)
+  function initialRender() {
+    // Reset any updated flags (fresh start)
+    resetUpdatedFlags();
+    // Ensure no leftover "updated" markers in the initial state.
+    // Make sure all updated = false.
+    students = students.map(s => ({ ...s, updated: false }));
+    // direct DOM full render
+    renderWithDirectDOM();
+    // Virtual DOM: reset lastVirtualState and perform full render
+    const virtualContainer = document.getElementById("virtualStudentList");
+    if (virtualContainer) {
+      const freshRep = getCurrentVirtualRepresentation();
+      fullRenderVirtualList(virtualContainer, freshRep);
+      lastVirtualState = JSON.parse(JSON.stringify(freshRep));
+    } else {
+      renderWithVirtualDOM(); 
+    }
+  }
+  
+  // ---------- event handlers with clear array mutation & render demonstration -----
+  // Handler: "Change 1–2 student(s) in array" 
+  // This modifies the underlying students array (updates name + sets updated flag)
+  // After this, the UI stays as before until user clicks one of the render buttons.
+  // BUT we also want optionally to allow re-render demonstration. So after modify, we do NOT auto-render.
+  // But we display helper info: user must click direct or virtual.
+  let lastChangedMessageTimeout = null;
+  function changeStudentRecords() {
+    const changedIndices = modifyOneOrTwoStudents();
+    // Optionally show a small transient feedback, but NOT auto render.
+    // ensure that we don't auto re-render so that user sees exactly what each render function does.
+    const infoDiv = document.querySelector('.info-note');
+    const originalText = infoDiv.innerHTML;
+    const changedNames = changedIndices.map(i => students[i].name.split(' ')[0]).join(', ');
+    infoDiv.style.transition = '0.1s';
+    infoDiv.style.background = '#fff3cf';
+    infoDiv.innerHTML = `✅ Array updated: ${changedIndices.length} student(s) changed. Use render buttons to refresh panels.`;
+    if (lastChangedMessageTimeout) clearTimeout(lastChangedMessageTimeout);
+    lastChangedMessageTimeout = setTimeout(() => {
+      infoDiv.style.background = '#eef3fc';
+      infoDiv.innerHTML = originalText;
+    }, 2300);
+  }
+  
+  // ---- DIRECT DOM BUTTON: forces a full re-render from scratch using direct DOM ----
+  function onDirectRender() {
+    renderWithDirectDOM();
+    // also we can optionally show visual feedback
+    const directHeader = document.querySelector('#directListContainer');
+    flashElement(document.getElementById("directStudentList")?.parentElement);
+  }
+  
+  // ---- VIRTUAL DOM BUTTON: uses virtual diff to update only changed records ----
+  function onVirtualRender() {
+    renderWithVirtualDOM();
+    flashElement(document.getElementById("virtualStudentList")?.parentElement);
+  }
+  
+  function flashElement(el) {
+    if (!el) return;
+    el.style.transition = 'background 0.2s';
+    const originalBg = el.style.backgroundColor;
+    el.style.backgroundColor = '#d9effa';
+    setTimeout(() => { el.style.backgroundColor = ''; }, 200);
+  }
+  
+  // ---------- attach Event Listeners after DOM ready ----------
+  document.addEventListener('DOMContentLoaded', () => {
+    initialRender();
+    
+    const changeBtn = document.getElementById('changeNamesBtn');
+    const directBtn = document.getElementById('directRenderBtn');
+    const virtualBtn = document.getElementById('virtualRenderBtn');
+    
+    if (changeBtn) changeBtn.addEventListener('click', changeStudentRecords);
+    if (directBtn) directBtn.addEventListener('click', onDirectRender);
+    if (virtualBtn) virtualBtn.addEventListener('click', onVirtualRender);
+  });
+  
+  // Additional safety: When user modifies student array, we may want to eventually ensure that virtual snapshot
+  // is not prematurely synced, exactly separating concerns: Direct Dom re-render always renders entire array.
+  // For virtual: renderWithVirtualDOM will compare lastVirtualState against current students array and only patch differences.
+  // That perfectly aligns: Virtual DOM approach updates only changed records.
+  
+  // Note: Edge case: "updated" flag is used both for UI badge and diffing, and after virtual render, it populates badge.
+  // Direct DOM re-render also shows updated badge if present. But after re-render, if we call direct render after modify,
+  // it will re-render everything and show which students are updated as per flags. The virtual render will only change those specific rows.
+  // That fulfills requirement: Virtual DOM updates only changed records.
+  // Also we maintain updated flags to visually indicate which student changed last.
+  // For students that are modified again later, we call resetUpdatedFlags before modify.
+</script>
+</body>
+</html>
