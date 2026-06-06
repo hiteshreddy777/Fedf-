@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Library Management System</title>
+</head>
+<body>
+
+<h2>Library Book Management</h2>
+
+<button onclick="getBooks()">GET Books</button>
+<button onclick="addBook()">POST Book</button>
+<button onclick="updateBook()">PUT Book</button>
+<button onclick="deleteBook()">DELETE Book</button>
+
+<h3>Output:</h3>
+<p id="output"></p>
+
+<script>
+
+    // GET Books
+    function getBooks() {
+
+        document.getElementById("output").innerHTML =
+
+        "<h3>Book List</h3>" +
+
+        "1. Book: The Alchemist <br>" +
+        "Author: Paulo Coelho <br>" +
+        "Price: 400 <br><br>" +
+
+        "2. Book: Atomic Habits <br>" +
+        "Author: James Clear <br>" +
+        "Price: 550";
+    }
+
+
+    // POST Add New Book
+    function addBook() {
+
+        document.getElementById("output").innerHTML =
+
+        "<h3>Updated Book List</h3>" +
+
+        "1. Book: The Alchemist <br>" +
+        "Author: Paulo Coelho <br>" +
+        "Price: 400 <br><br>" +
+
+        "2. Book: Atomic Habits <br>" +
+        "Author: James Clear <br>" +
+        "Price: 550 <br><br>" +
+
+        "3. Book: Ikigai <br>" +
+        "Author: Hector Garcia <br>" +
+        "Price: 300";
+    }
+
+
+    // PUT Update Book Details
+    function updateBook() {
+
+        document.getElementById("output").innerHTML =
+
+        "<h3>Updated Book Details</h3>" +
+
+        "1. Book: The Alchemist - Special Edition <br>" +
+        "Author: Paulo Coelho <br>" +
+        "Price: 650 <br><br>" +
+
+        "2. Book: Atomic Habits <br>" +
+        "Author: James Clear <br>" +
+        "Price: 550 <br><br>" +
+
+        "3. Book: Ikigai <br>" +
+        "Author: Hector Garcia <br>" +
+        "Price: 300";
+    }
+
+
+    // DELETE Book
+    function deleteBook() {
+
+        document.getElementById("output").innerHTML =
+
+        "<h3>Book List After Delete</h3>" +
+
+        "1. Book: The Alchemist - Special Edition <br>" +
+        "Author: Paulo Coelho <br>" +
+        "Price: 650 <br><br>" +
+
+        "2. Book: Ikigai <br>" +
+        "Author: Hector Garcia <br>" +
+        "Price: 300";
+    }
+
+</script>
+
+</body>
+</html>
