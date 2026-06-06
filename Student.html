@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Management System</title>
+</head>
+<body>
+
+  <h2>Smart Student Management System</h2>
+
+  <button onclick="displayStudents()">Display Students</button>
+  <button onclick="averageMarks()">Average Marks</button>
+  <button onclick="topStudents()">Top Students (>75)</button>
+  <button onclick="departmentCount()">Department Count</button>
+  <button onclick="countVowels()">Count Vowels</button>
+
+  <h3>Output:</h3>
+  <div id="output"></div>
+
+  <script>
+
+  const students = [
+  { id: 1, name: "Jhansi", marks: 94, department: "CSIT", attendance:95},
+  { id: 2, name: "Lahari", marks: 96, department: "CSE", attendance:90},
+  { id: 3, name: "Keerthi", marks: 85, department: "ECE", attendance:85},
+  { id: 4, name: "Akshitha", marks: 82, department: "EEE", attendance:80}
+  ];
+
+  function displayStudents(){
+    let result="";
+    for(let student of students){
+        for(let key in student){
+            result += key + ": " + student[key] + "<br>";
+        }
+        result += "<hr>";
+    }
+    document.getElementById("output").innerHTML=result;
+  }
+
+  function averageMarks() {
+    let total=0;
+    for(let student of students){
+        total += student.marks;
+    }
+    let avg = total/students.length;
+    document.getElementById("output").innerHTML="Average Marks: " + avg;
+  }
+
+  function topStudents(){
+    let result="Students with marks > 75:<br>";
+    for(let student of students){
+        if(student.marks > 75){
+            result += student.name + "<br>";
+        }
+    }
+    document.getElementById("output").innerHTML=result;
+  }
+  
+   function departmentCount() {
+    let count={};
+    for(let student of students){
+        if(count[student.department]){
+            count[student.department]++;
+        } else{
+            count[student.department]=1;
+        }
+    }
+    let result= "Department Count:<br>";
+    for(let key in count){
+        result += key + ": " + count[key] + "<br>";
+    }
+    document.getElementById("output").innerHTML=result;
+   } 
+
+   function countVowels() {
+    let count=0;
+    const vowels="aeiouAEIOU";
+    for(let student of students){
+        for(let char of student.name){
+            if(vowels.includes(char)){
+                count++;
+            }
+        }
+    }
+    document.getElementById("output").innerHTML = "Total Vowels in Names: " + count;
+   }
+   </script>
+   </body>
+   </html>
